@@ -14,7 +14,7 @@
 .modal-content {
     background-color: var(--background);
     border-radius: 8px;
-    width: 450px;  /* Increased from 400px */
+    width: 450px;  
     max-width: 90%;
     max-height: 85vh;
     overflow-y: auto;
@@ -70,11 +70,10 @@
     border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 0.9rem;
-    background-color: var(--background);  /* Match theme background */
-    color: var(--text-primary);  /* Match theme text color */
+    background-color: var(--background);  
+    color: var(--text-primary);  
 }
 
-/* Light mode specific input styles */
 :root[data-theme='light'] .form-group input,
 :root[data-theme='light'] .form-group select,
 :root[data-theme='light'] .form-group textarea {
@@ -82,7 +81,6 @@
     border-color: #e0e0e0;
 }
 
-/* Dark mode specific input styles */
 :root[data-theme='dark'] .form-group input,
 :root[data-theme='dark'] .form-group select,
 :root[data-theme='dark'] .form-group textarea {
@@ -90,7 +88,6 @@
     border-color: #404040;
 }
 
-/* Focus states for form elements */
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -161,19 +158,16 @@
     text-decoration: underline;
 }
 
-/* Placeholder text colors */
 .form-group input::placeholder,
 .form-group textarea::placeholder {
     color: var(--text-secondary);
     opacity: 0.7;
 }
 
-/* Dark mode styles */
 [data-theme='dark'] .modal-content {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Responsive styles */
 @media (max-width: 480px) {
     .modal-content {
         width: 95%;
