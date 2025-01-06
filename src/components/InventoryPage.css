@@ -8,7 +8,6 @@
   --accent: #007bff;
 }
 
-/* Base styles */
 .inventory-page {
   background-color: var(--background);
   color: var(--text-primary);
@@ -28,7 +27,6 @@
   color: var(--text-primary);
 }
 
-/* Model Filters Section */
 .model-filters {
   margin-bottom: 1.5rem;
   position: relative;
@@ -91,7 +89,6 @@
   right: 0.5rem;
 }
 
-/* Updated model filter button styles */
 .model-filter-btn {
   background-color: #333;
   border: none;
@@ -131,7 +128,6 @@
   color: black;
 }
 
-/* Filters & Sort Container */
 .filters-sort-container {
   display: flex;
   align-items: center;
@@ -140,7 +136,6 @@
   margin-bottom: 2rem;
 }
 
-/* Sort Options */
 .sort-options {
   display: flex;
   gap: 1rem;
@@ -165,7 +160,6 @@
   text-decoration: underline;
 }
 
-/* Filter Dropdowns */
 .filter-dropdowns {
   display: flex;
   gap: 0.75rem;
@@ -207,7 +201,6 @@
 }
 
 
-/* Car Grid */
 .car-grid {
   display: grid;
   grid-template-columns: repeat(4, 266px);
@@ -285,7 +278,6 @@
   overflow: hidden;
 }
 
-/* Pagination */
 .pagination-container {
   display: flex;
   justify-content: center;
@@ -320,7 +312,6 @@
   color: var(--text-secondary);
 }
 
-/* Loading and Error States */
 .loading-state,
 .error-state {
   display: flex;
@@ -331,7 +322,6 @@
   color: var(--text-secondary);
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
   .car-grid {
     grid-template-columns: repeat(3, 266px);
@@ -387,7 +377,6 @@
   }
 }
 
-/* Touch Device Optimizations */
 @media (hover: none) {
   .car-item:hover {
     transform: none;
@@ -425,7 +414,6 @@
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .car-item,
   .model-filter-btn,
