@@ -37,7 +37,6 @@ const PhotoGalleryPage = () => {
     fetchCarData();
   }, [id]);
 
-  // Add event listener for ESC key
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
@@ -65,7 +64,6 @@ const PhotoGalleryPage = () => {
     carData.image6, carData.image7, carData.image8, carData.image9, carData.image10
   ].filter(Boolean);
 
-  // In a real application, you'd want to have proper categorization from your API
   const categories = {
     all: allImages,
     exterior: allImages.slice(0, Math.floor(allImages.length * 0.6)),
