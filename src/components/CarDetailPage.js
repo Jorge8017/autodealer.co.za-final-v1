@@ -14,7 +14,6 @@ const CarDetailPage = () => {
   const { id, carSlug } = useParams();
   const navigate = useNavigate();
   
-  // State declarations
   const [carData, setCarData] = useState(null);
   const [suggestedCars, setSuggestedCars] = useState([]);
   const [mainImage, setMainImage] = useState(0);
@@ -24,24 +23,20 @@ const CarDetailPage = () => {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState(null);
 
-  // Format mileage with km/h
   const formatMileage = (mileage) => {
     return `${mileage}km/h`;
   };
 
-  // Format car details
   const formatCarDetails = (transmission, mileage) => {
     return `${transmission} • ${formatMileage(mileage)}`;
   };
 
-  // Generate car slug
   const generateCarSlug = (car) => {
     return `used-${car.year}-${car.make}-${car.model}-${car.region}-${car.city}`
       .toLowerCase()
       .replace(/\s+/g, '-');
   };
 
-  // Handlers
   const handleImageClick = (imageUrl) => {
     setModalImage(imageUrl);
     setIsModalOpen(true);
@@ -82,12 +77,10 @@ const CarDetailPage = () => {
     setIsContactModalOpen(true);
   };
 
-  // Fetch car data and suggested cars
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch main car data
         const carResponse = await fetch(`${API_BASE_URL}${DEALER_API_ENDPOINT}?getlistings=1&single=1&ID=${id}`);
         const carData = await carResponse.json();
         
@@ -97,7 +90,6 @@ const CarDetailPage = () => {
           setError('Car data not found');
         }
 
-        // Fetch featured cars for suggestions
         const featuredResponse = await axios.get(`${API_BASE_URL}${FEATURED_API_ENDPOINT}`);
         const featuredIds = featuredResponse.data.car_ids;
 
@@ -120,7 +112,6 @@ const CarDetailPage = () => {
     fetchData();
   }, [id]);
 
-  // Handle keyboard navigation
   const handleKeyPress = useCallback((e) => {
     if (isModalOpen && e.key === 'Escape') {
       handleCloseModal();
@@ -138,7 +129,6 @@ const CarDetailPage = () => {
     };
   }, [handleKeyPress]);
 
-  // Control body scroll when modal is open
   useEffect(() => {
     if (isModalOpen || isContactModalOpen) {
       document.body.style.overflow = 'hidden';
