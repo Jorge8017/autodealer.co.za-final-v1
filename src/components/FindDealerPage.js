@@ -30,7 +30,6 @@ export default function FindDealerPage() {
     'Western Cape'
   ];
 
-  // Fetch dealers based on selected region
   const fetchDealers = async (region = '') => {
     setLoading(true);
     try {
@@ -46,7 +45,6 @@ export default function FindDealerPage() {
           : [response.data.listings];
         setDealers(dealersList);
         
-        // If there's a search term, filter immediately
         if (searchTerm) {
           filterDealersBySearchTerm(searchTerm, dealersList);
         }
@@ -65,7 +63,6 @@ export default function FindDealerPage() {
     }
   };
 
-  // Filter dealers based on search term
   const filterDealersBySearchTerm = (term, dealersList = dealers) => {
     if (!term) {
       setFilteredDealers([]);
@@ -82,13 +79,11 @@ export default function FindDealerPage() {
     setShowSuggestions(true);
   };
 
-  // Debounced version of filter function
   const debouncedFilter = useCallback(
     debounce((term) => filterDealersBySearchTerm(term), 300),
     [dealers]
   );
 
-  // Initial fetch of dealers
   useEffect(() => {
     fetchDealers();
   }, []);
@@ -102,7 +97,7 @@ export default function FindDealerPage() {
   const handleRegionSelect = async (region) => {
     const newRegion = region === selectedRegion ? '' : region;
     setSelectedRegion(newRegion);
-    setSearchTerm(''); // Clear search term when changing region
+    setSearchTerm(''); 
     await fetchDealers(newRegion);
   };
 
