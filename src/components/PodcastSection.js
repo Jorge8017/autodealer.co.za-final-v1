@@ -28,7 +28,6 @@ const PodcastSection = () => {
       <div className="podcast-container">
         <h2 className="podcast-title">Latest episodes</h2>
         <div className="podcast-grid">
-          {/* Tru Bru Logo Card */}
           <div className="podcast-card podcast-logo-card">
             <div className="podcast-image-container">
               <img 
@@ -39,7 +38,6 @@ const PodcastSection = () => {
             </div>
           </div>
           
-          {/* Video Card */}
           <div className="podcast-card" onClick={() => setIsVideoModalOpen(true)}>
             <div className="podcast-image-container video-card">
               <img 
@@ -58,7 +56,6 @@ const PodcastSection = () => {
             </div>
           </div>
 
-          {/* Other Cards */}
           {episodes.slice(1).map((episode) => (
             <div key={episode.id} className="podcast-card">
               <div className="podcast-image-container">
