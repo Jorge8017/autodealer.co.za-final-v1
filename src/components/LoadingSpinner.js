@@ -17,7 +17,7 @@ const LoadingSpinner = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const rotation = (percentage / 100) * 180 - 90; // Convert percentage to degrees
+  const rotation = (percentage / 100) * 180 - 90; 
 
   return (
     <div className="loader-container">
