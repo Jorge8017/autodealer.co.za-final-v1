@@ -152,7 +152,6 @@
     background-color: #b1000f;
   }
   
-  /* Hide scrollbar but keep functionality */
   .price-grid::-webkit-scrollbar {
     display: none;
   }
@@ -161,15 +160,13 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
-  /* Larger screens */
+ 
   @media (min-width: 1200px) {
     .price-range-page {
       padding: 2rem 4rem;
     }
   }
   
-  /* Medium screens */
   @media (max-width: 1024px) {
     .brand-grid {
       grid-template-columns: repeat(2, 1fr);
@@ -196,8 +193,7 @@
       font-size: 1.5rem;
     }
   }
-  
-  /* Small screens */
+
   @media (max-width: 640px) {
     .price-range-page {
       padding: 1rem;
@@ -251,7 +247,6 @@
     }
   }
   
-  /* Very small screens */
   @media (max-width: 380px) {
     .brand-card,
     .price-card {
@@ -275,8 +270,7 @@
       font-size: 0.75rem;
     }
   }
-  
-  /* Accessibility */
+ 
   @media (prefers-reduced-motion: reduce) {
     .brand-card,
     .price-card,
@@ -284,8 +278,7 @@
       transition: none;
     }
   }
-  
-  /* Focus states */
+
   .brand-card:focus-visible,
   .price-card:focus-visible,
   .available-deals-button:focus-visible {
