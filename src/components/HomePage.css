@@ -1,4 +1,3 @@
-/* Base styles */
 .home-page {
   font-family: Arial, sans-serif;
   background-color: var(--background);
@@ -12,7 +11,6 @@
   padding: 2rem;
 }
 
-/* Featured Section */
 .featured-section {
   position: relative;
   margin-bottom: 2rem;
@@ -97,7 +95,6 @@
   opacity: 0.9;
 }
 
-/* Featured Thumbnails */
 .featured-thumbnails {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -108,7 +105,6 @@
   position: relative;
 }
 
-/* Make all thumbnails consistent */
 .featured-secondary,
 .featured-secondary img,
 .featured-secondary.text-content,
@@ -129,7 +125,6 @@
   transition: transform 0.3s ease;
 }
 
-/* Ensure consistent sizing for all thumbnails */
 .featured-secondary:nth-child(1),
 .featured-secondary:nth-child(2),
 .featured-secondary:nth-child(3),
@@ -141,7 +136,6 @@
   transform: scale(1.05);
 }
 
-/* Text content styling */
 .text-content {
   background-color: var(--secondary-bg);
   padding: 1rem;
@@ -175,7 +169,7 @@
   color: var(--text-secondary);
   margin-top: 0.5rem;
 }
-/* Podcast Section */
+
 .podcast-section {
   position: relative;
   padding: 1.5rem 0;
@@ -303,7 +297,6 @@
   right: 0.75rem;
 }
 
-/* Filters Section */
 .filters-wrapper {
   display: flex;
   justify-content: space-between;
@@ -335,7 +328,6 @@
   border-radius: 35px;
 }
 
-/* Sort Options */
 .sort-options {
   display: flex;
   gap: 1rem;
@@ -362,7 +354,6 @@
   border-color: var(--accent);
 }
 
-/* Filter Buttons */
 .filter-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -380,7 +371,6 @@
   color: white;
 }
 
-/* Car Grid */
 .car-grid {
   display: grid;
   grid-template-columns: repeat(4, 266px);
@@ -456,7 +446,6 @@
   overflow: hidden;
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
   .featured-card {
     grid-template-columns: 60% 40%;
@@ -553,7 +542,6 @@
   }
 }
 
-/* Touch Device Optimizations */
 @media (hover: none) {
   .featured-slide,
   .featured-secondary img,
@@ -567,14 +555,12 @@
   }
 }
 
-/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
   }
 }
 
-/* Focus states */
 .sort-button:focus-visible,
 .filter-button:focus-visible,
 .podcast-scroll-button:focus-visible {
