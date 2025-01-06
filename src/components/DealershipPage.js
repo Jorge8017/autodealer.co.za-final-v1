@@ -21,7 +21,6 @@ export default function DealershipPage() {
   const [sortOrder, setSortOrder] = useState('New');
   const [selectedBodyType, setSelectedBodyType] = useState('');
 
-  // Fetch dealer's cars
   useEffect(() => {
     const fetchDealerCars = async () => {
       setLoading(true);
