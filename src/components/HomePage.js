@@ -20,7 +20,6 @@ const HomePage = () => {
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const navigate = useNavigate();
 
-  // Podcast episodes data
   const podcastEpisodes = [
     {
       id: 1,
@@ -118,7 +117,6 @@ const HomePage = () => {
     setLoading(false);
   };
 
-  // Effect hooks
   useEffect(() => {
     const fetchFeaturedContent = async () => {
       try {
@@ -155,7 +153,6 @@ const HomePage = () => {
   return (
     <div className="home-page">
       <main className="main-content">
-        {/* Featured Content Section */}
         {featuredContent.length > 0 && (
           <section className="featured-section">
             <div className="featured-slide active">
