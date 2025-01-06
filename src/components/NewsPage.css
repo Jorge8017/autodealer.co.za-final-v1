@@ -60,7 +60,6 @@
     border-radius: 8px;
   }
   
-  /* Responsive styles */
   @media (max-width: 768px) {
     .article-content {
       padding: 1.5rem;
