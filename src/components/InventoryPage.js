@@ -15,7 +15,6 @@ const InventoryPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // State declarations
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,21 +26,18 @@ const InventoryPage = () => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
-  // Get URL parameters
   const make = searchParams.get('make') || '';
   const model = searchParams.get('model') || '';
   const region = searchParams.get('region') || '';
   const bodytype = searchParams.get('bodytype') || '';
   const maxPrice = searchParams.get('max-price');
 
-  // State for filters
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedTransmission, setSelectedTransmission] = useState('');
   const [selectedBodyType, setSelectedBodyType] = useState(bodytype);
   const [selectedRegion, setSelectedRegion] = useState('');
   const [sortOrder, setSortOrder] = useState('newly-listed');
 
-  // Options for filter dropdowns
   const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i);
   const transmissions = ['Automatic', 'Manual'];
   const bodyTypes = ['Sedan', 'SUV', 'Truck', 'Coupe', 'Hatchback', 'Van', 'Wagon', 'Convertible'];
@@ -50,7 +46,6 @@ const InventoryPage = () => {
     'Mpumalanga', 'Northern Cape', 'North West', 'Western Cape'
   ];
 
-  // Sort order constants
   const SORT_ORDERS = {
     'newly-listed': '',
     'old-to-new': 'Old',
@@ -60,7 +55,6 @@ const InventoryPage = () => {
     'mileage-high': 'MileageHigh'
   };
 
-  // Format helpers
   const formatMileage = (mileage) => `${mileage} km/h`;
   const formatCarDetails = (transmission, mileage) => `${transmission} • ${formatMileage(mileage)}`;
   
@@ -69,22 +63,18 @@ const InventoryPage = () => {
       .toLowerCase()
       .replace(/\s+/g, '-');
   };
-  // Effects and handlers
   useEffect(() => {
     const fetchCars = async () => {
       setLoading(true);
       try {
-        // Construct API URL with filters
         let apiUrl = `${API_BASE_URL}${DEALER_API_ENDPOINT}?getlistings=1`;
         
-        // Add max price if provided
         if (maxPrice) {
           apiUrl += `&Max-price=${maxPrice}`;
         } else {
-          apiUrl += '&Max-price=7000000'; // Default max price
+          apiUrl += '&Max-price=7000000'; 
         }
         
-        // Add other filters
         if (make) apiUrl += `&Makes=${make}`;
         if (model) apiUrl += `&Models=${model}`;
         if (selectedYear) apiUrl += `&MinYear=${selectedYear}&MaxYear=${selectedYear}`;
@@ -117,7 +107,6 @@ const InventoryPage = () => {
     fetchCars();
   }, [make, model, page, selectedYear, selectedTransmission, selectedBodyType, selectedRegion, sortOrder, maxPrice]);
 
-  // Effect for model selection
   useEffect(() => {
     if (make && !model) {
       const searchParams = new URLSearchParams(location.search); 
@@ -126,7 +115,6 @@ const InventoryPage = () => {
     }
   }, [make, model, location.search, navigate]);
 
-  // Check scroll capability
   const checkScroll = useCallback(() => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
@@ -135,12 +123,10 @@ const InventoryPage = () => {
     }
   }, []);
 
-  // Add scroll check whenever models change
   useEffect(() => {
     checkScroll();
   }, [availableModels, checkScroll]);
 
-  // Add scroll event listener
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
     if (scrollContainer) {
