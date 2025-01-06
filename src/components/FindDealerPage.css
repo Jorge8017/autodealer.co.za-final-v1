@@ -215,12 +215,10 @@
   border-color: var(--accent);
 }
 
-/* Dark mode specific styles */
 [data-theme='dark'] .form-section {
   background-color: var(--secondary-bg);
 }
 
-/* Loading and error states */
 .dealer-suggestions-loading,
 .dealer-suggestions-error,
 .no-results {
@@ -229,7 +227,6 @@
   color: var(--text-secondary);
 }
 
-/* Responsive styles */
 @media (max-width: 1024px) {
   .form-container {
     padding: 1.5rem;
@@ -283,14 +280,12 @@
   }
 }
 
-/* Touch device optimizations */
 @media (hover: none) {
   .province-button:hover {
     transform: none;
   }
 }
 
-/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .province-button {
     transition: none;
