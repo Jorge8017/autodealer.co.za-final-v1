@@ -3,7 +3,7 @@ import { Upload, ArrowLeft } from 'lucide-react';
 import './SellCarPage.css';
 
 export default function SellCarPage() {
-  const [currentStep, setCurrentStep] = useState('personal'); // 'personal' or 'car'
+  const [currentStep, setCurrentStep] = useState('personal'); 
   const [personalData, setPersonalData] = useState({
     firstName: '',
     lastName: '',
@@ -47,7 +47,6 @@ export default function SellCarPage() {
     damagePhotos: []
   });
 
-  // Clear photo previews on unmount
   useEffect(() => {
     return () => {
       Object.values(previews).forEach(preview => {
@@ -140,7 +139,6 @@ export default function SellCarPage() {
     
     const formDataToSend = new FormData();
     
-    // Append all form data
     Object.entries(personalData).forEach(([key, value]) => {
       formDataToSend.append(key, value);
     });
@@ -148,7 +146,6 @@ export default function SellCarPage() {
       formDataToSend.append(key, value);
     });
     
-    // Append photos
     ['frontView', 'backView', 'rightSideView', 'leftSideView'].forEach(type => {
       if (photos[type]) {
         formDataToSend.append(type, photos[type]);
