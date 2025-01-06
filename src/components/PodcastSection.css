@@ -1,4 +1,3 @@
-/* Podcast Section Styles */
 .podcast-section {
   position: relative;
   padding: 1.5rem 0;
@@ -31,7 +30,6 @@
   margin-right: 2rem;
 }
 
-/* Styles for the fixed logo card */
 .podcast-logo-card {
   position: sticky;
   left: 0;
@@ -59,7 +57,6 @@
   object-fit: contain;
 }
 
-/* Styles for the scrolling content */
 .podcast-scroll-content {
   display: flex;
   gap: 0.75rem;
@@ -75,7 +72,6 @@
   display: none;
 }
 
-/* Regular podcast cards */
 .podcast-card {
   min-width: 220px;
   width: 220px;
@@ -124,7 +120,6 @@
   margin-bottom: 0.75rem;
 }
 
-/* Navigation buttons */
 .podcast-scroll-button {
   position: absolute;
   top: 50%;
@@ -155,7 +150,6 @@
   right: 0.75rem;
 }
 
-/* Responsive styles */
 @media (max-width: 1024px) {
   .podcast-card {
     min-width: 200px;
@@ -234,7 +228,6 @@
   }
 }
 
-/* Touch device optimizations */
 @media (hover: none) {
   .podcast-card:hover {
     transform: none;
@@ -245,7 +238,6 @@
   }
 }
 
-/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .podcast-card,
   .podcast-scroll-content {
