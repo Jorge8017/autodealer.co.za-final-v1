@@ -17,7 +17,6 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // State management
   const [searchTerm, setSearchTerm] = useState('');
   const [makeSuggestions, setMakeSuggestions] = useState([]);
   const [modelSuggestions, setModelSuggestions] = useState([]);
@@ -28,7 +27,6 @@ const Navbar = () => {
 
   const logo = theme === 'light' ? lightLogo : darkLogo;
 
-  // Fetch makes on component mount
   useEffect(() => {
     const fetchMakes = async () => {
       try {
@@ -45,7 +43,6 @@ const Navbar = () => {
     };
     fetchMakes();
   }, []);
-  // Fetch regions on component mount
   useEffect(() => {
     const fetchRegions = async () => {
       try {
@@ -86,7 +83,6 @@ const Navbar = () => {
     fetchRegions();
   }, []);
 
-  // Fetch models when make is selected
   useEffect(() => {
     const makeTag = selectedTags.find(tag => tag.type === 'make');
     if (makeTag) {
@@ -110,7 +106,6 @@ const Navbar = () => {
     }
   };
 
-  // Update suggestions based on search term
   useEffect(() => {
     if (searchTerm) {
       if (!selectedTags.some(tag => tag.type === 'make')) {
@@ -210,7 +205,6 @@ const Navbar = () => {
     const newRegion = e.target.value;
     updateRegion(newRegion);
 
-    // Update URL with region parameter
     const searchParams = new URLSearchParams(location.search);
     if (newRegion !== 'Region') {
       searchParams.set('region', newRegion);
@@ -218,7 +212,6 @@ const Navbar = () => {
       searchParams.delete('region');
     }
 
-    // Navigate to the same page with updated region parameter
     const newSearch = searchParams.toString();
     navigate({
       pathname: location.pathname,
