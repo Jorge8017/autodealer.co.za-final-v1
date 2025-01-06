@@ -296,7 +296,6 @@
   }
 }
 
-/* Dark mode specific styles */
 [data-theme='dark'] .step-card {
   background-color: var(--secondary-bg);
 }
@@ -322,7 +321,6 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Responsive styles */
 @media (max-width: 1024px) {
   .steps-container {
     gap: 1.5rem;
@@ -419,7 +417,6 @@
   }
 }
 
-/* Touch device optimizations */
 @media (hover: none) {
   .cta-button:hover,
   .file-upload:hover,
@@ -433,7 +430,6 @@
   }
 }
 
-/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .cta-button,
   .file-upload,
