@@ -355,7 +355,6 @@
   background-color: #f8f9fa;
 }
 
-/* Responsive styles */
 @media (max-width: 1024px) {
   .header-content {
     padding: 0 1rem;
