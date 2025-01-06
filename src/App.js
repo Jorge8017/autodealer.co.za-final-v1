@@ -17,7 +17,6 @@ import FindDealerPage from './components/FindDealerPage';
 import { trackPageView } from './services/analytics';
 import './App.css';
 
-// Analytics wrapper component
 function AnalyticsWrapper() {
   const location = useLocation();
 
@@ -28,7 +27,6 @@ function AnalyticsWrapper() {
   return null;
 }
 
-// Main app content wrapped with RegionProvider
 function AppContent() {
   return (
     <>
