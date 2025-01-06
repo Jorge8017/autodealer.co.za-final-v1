@@ -12,7 +12,6 @@
   box-sizing: border-box;
 }
 
-/* Navigation Breadcrumb */
 .navigation-breadcrumb {
   padding: 1rem 0;
   color: var(--text-secondary);
@@ -33,7 +32,6 @@
   color: var(--accent);
 }
 
-/* Main Header */
 .main-header {
   margin-bottom: 1.5rem;
 }
@@ -50,7 +48,6 @@
   font-size: 1.1rem;
 }
 
-/* Image Gallery */
 .image-gallery {
   display: grid;
   grid-template-columns: 1fr 320px;
@@ -161,7 +158,6 @@
   background: rgba(0, 0, 0, 0.9);
 }
 
-/* Side Images Grid */
 .side-images-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -211,7 +207,6 @@
   background-color: rgba(0, 0, 0, 0.9);
 }
 
-/* Car Details Layout */
 .car-details-layout {
   display: grid;
   grid-template-columns: 1fr 300px;
@@ -223,7 +218,6 @@
   flex: 1;
 }
 
-/* Price Section */
 .price-section {
   margin-bottom: 1.5rem;
 }
@@ -235,7 +229,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* Details Grid */
 .details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -281,7 +274,6 @@
   background-color: var(--spec-value-bg);
 }
 
-/* Content Sections */
 .content-sections {
   display: flex;
   flex-direction: column;
@@ -319,7 +311,6 @@
   color: var(--accent);
 }
 
-/* Contact Sidebar */
 .contact-sidebar {
   background-color: var(--secondary-bg);
   padding: 1.5rem;
@@ -365,7 +356,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* Similar Cars Section */
 .similar-cars-wrapper {
   margin-top: 4rem;
   padding: 2rem 0;
@@ -386,7 +376,6 @@
   color: var(--text-primary);
 }
 
-/* Modal Styles */
 .image-modal {
   position: fixed;
   top: 0;
@@ -469,7 +458,6 @@
   background-color: rgba(0, 0, 0, 0.8);
 }
 
-/* Loading and Error States */
 .loading-state,
 .error-state {
   display: flex;
@@ -480,7 +468,6 @@
   color: var(--text-secondary);
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
   .details-grid {
     grid-template-columns: 1fr;
@@ -616,7 +603,6 @@
   }
 }
 
-/* Touch Device Optimizations */
 @media (hover: none) {
   .main-image-nav,
   .modal-nav-btn {
@@ -634,22 +620,20 @@
   }
 }
 
-/* Theme Colors */
 :root {
-  --border-color: rgba(0, 0, 0, 0.15);        /* Light grey border for light mode */
-  --grid-gap-color: rgba(0, 0, 0, 0.1);       /* Gap color for light mode */
-  --spec-label-bg: #f5f5f5;                   /* Light mode label background */
-  --spec-value-bg: #ffffff;                   /* Light mode value background */
+  --border-color: rgba(0, 0, 0, 0.15);       
+  --grid-gap-color: rgba(0, 0, 0, 0.1);       
+  --spec-label-bg: #f5f5f5;                   
+  --spec-value-bg: #ffffff;                  
 }
 
 [data-theme='dark'] {
-  --border-color: rgba(255, 255, 255, 0.15);  /* Light grey border for dark mode */
-  --grid-gap-color: rgba(255, 255, 255, 0.1); /* Gap color for dark mode */
-  --spec-label-bg: #1E1E1E;                   /* Dark mode label background */
-  --spec-value-bg: #141414;                   /* Dark mode value background */
+  --border-color: rgba(255, 255, 255, 0.15);  
+  --grid-gap-color: rgba(255, 255, 255, 0.1); 
+  --spec-label-bg: #1E1E1E;                   
+  --spec-value-bg: #141414;                 
 }
 
-/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .featured-slide,
   .featured-secondary img,
