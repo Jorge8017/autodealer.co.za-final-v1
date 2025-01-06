@@ -95,7 +95,6 @@
   transform: scale(1.05);
 }
 
-/* Gallery Modal Styles */
 .gallery-modal {
   position: fixed;
   top: 0;
@@ -179,7 +178,6 @@
   background-color: rgba(0, 0, 0, 0.8);
 }
 
-/* Loading and Error States */
 .loading-state,
 .error-state {
   position: absolute;
@@ -190,7 +188,6 @@
   text-align: center;
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
   .modal-nav-btn {
     width: 50px;
@@ -250,7 +247,6 @@
   }
 }
 
-/* Touch Device Optimizations */
 @media (hover: none) {
   .gallery-item:hover img {
     transform: none;
@@ -262,7 +258,6 @@
   }
 }
 
-/* Dark Mode Specific Styles */
 [data-theme='dark'] .gallery-header {
   border-bottom-color: rgba(255, 255, 255, 0.1);
 }
