@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import LoadingSpinner from './LoadingSpinner';
 import './PhotoGalleryPage.css';
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const DEALER_API_ENDPOINT = process.env.REACT_APP_DEALER_API_ENDPOINT;
 
 const PhotoGalleryPage = () => {
   const { id } = useParams();
@@ -16,7 +20,7 @@ const PhotoGalleryPage = () => {
     const fetchCarData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`https://dealer.carmag.co.za/api-new.php?getlistings=1&single=1&ID=${id}`);
+        const response = await fetch(`${API_BASE_URL}${DEALER_API_ENDPOINT}?getlistings=1&single=1&ID=${id}`);
         const data = await response.json();
         
         if (data.listings && data.listings.length > 0) {
@@ -52,7 +56,7 @@ const PhotoGalleryPage = () => {
     };
   }, [isModalOpen]);
 
-  if (loading) return <div className="loading-state">Loading photos...</div>;
+  if (loading) return <LoadingSpinner />;
   if (error) return <div className="error-state">{error}</div>;
   if (!carData) return <div className="error-state">No photos available.</div>;
 
@@ -90,7 +94,6 @@ const PhotoGalleryPage = () => {
     
     setModalImage(categories[activeCategory][newIndex]);
   };
-
   return (
     <div className="photo-gallery-page">
       {/* Image Modal */}

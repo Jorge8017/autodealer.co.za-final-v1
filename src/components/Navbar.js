@@ -1,33 +1,38 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../contexts/ThemeContext';
-import { Moon, Sun } from 'lucide-react';
+import { useRegion } from '../contexts/RegionContext';
+import { Search, ChevronDown } from 'lucide-react';
 import lightLogo from '../assets/images/autodealer-logo-light.png';
 import darkLogo from '../assets/images/autodealer-logo-dark.png';
 import './Navbar.css';
 import axios from 'axios';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const APP_API_ENDPOINT = process.env.REACT_APP_APP_API_ENDPOINT;
+
 const Navbar = () => {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
+  const { selectedRegion, updateRegion } = useRegion();
   const location = useLocation();
   const navigate = useNavigate();
+
+  // State management
   const [searchTerm, setSearchTerm] = useState('');
   const [makeSuggestions, setMakeSuggestions] = useState([]);
   const [modelSuggestions, setModelSuggestions] = useState([]);
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [regions, setRegions] = useState(['Region']);
 
   const logo = theme === 'light' ? lightLogo : darkLogo;
-
-  // Function to check if a link is active
-  const isActive = (path) => location.pathname === path ? 'active' : '';
 
   // Fetch makes on component mount
   useEffect(() => {
     const fetchMakes = async () => {
       try {
-        const response = await axios.get('https://dealer.carmag.co.za/app/ajax.php?getmakes');
+        const response = await axios.get(`${API_BASE_URL}${APP_API_ENDPOINT}?getmakes`);
         const makesData = response.data;
         if (Array.isArray(makesData)) {
           setMakeSuggestions(makesData);
@@ -40,8 +45,48 @@ const Navbar = () => {
     };
     fetchMakes();
   }, []);
+  // Fetch regions on component mount
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}${APP_API_ENDPOINT}?getregions=1`);
+        const defaultRegions = [
+          'Region',
+          'Eastern Cape',
+          'Free State',
+          'Gauteng',
+          'Kwazulu-Natal',
+          'Limpopo',
+          'Mpumalanga',
+          'Northern Cape',
+          'North West',
+          'Western Cape'
+        ];
+        if (response.data && Array.isArray(response.data)) {
+          setRegions(['Region', ...response.data]);
+        } else {
+          setRegions(defaultRegions);
+        }
+      } catch (error) {
+        console.error('Error fetching regions:', error);
+        setRegions([
+          'Region',
+          'Eastern Cape',
+          'Free State',
+          'Gauteng',
+          'Kwazulu-Natal',
+          'Limpopo',
+          'Mpumalanga',
+          'Northern Cape',
+          'North West',
+          'Western Cape'
+        ]);
+      }
+    };
+    fetchRegions();
+  }, []);
 
-  // Fetch models based on selected make ID
+  // Fetch models when make is selected
   useEffect(() => {
     const makeTag = selectedTags.find(tag => tag.type === 'make');
     if (makeTag) {
@@ -52,7 +97,7 @@ const Navbar = () => {
   const fetchModels = async (makeId) => {
     try {
       const response = await axios.get(
-        `https://dealer.carmag.co.za/app/ajax.php?getranges=1&ID=${makeId}`
+        `${API_BASE_URL}${APP_API_ENDPOINT}?getranges=1&ID=${makeId}`
       );
       const modelsData = response.data;
       if (Array.isArray(modelsData)) {
@@ -86,17 +131,33 @@ const Navbar = () => {
     }
   }, [searchTerm, makeSuggestions, modelSuggestions, selectedTags]);
 
+  const isActive = (path) => {
+    if (path === '/cars-for-sale') {
+      return location.pathname.startsWith('/cars-for-sale') || location.pathname.startsWith('/car-for-sale') ? 'active' : '';
+    }
+    return location.pathname === path ? 'active' : '';
+  };
+
   const handleSearch = () => {
     const makeTag = selectedTags.find(tag => tag.type === 'make');
     const modelTag = selectedTags.find(tag => tag.type === 'model');
-    
+
     let searchUrl = '/cars-for-sale';
-    
+    let params = new URLSearchParams();
+
     if (makeTag) {
-      searchUrl += `?make=${encodeURIComponent(makeTag.name)}`;
+      params.append('make', makeTag.name);
       if (modelTag) {
-        searchUrl += `&model=${encodeURIComponent(modelTag.name)}`;
+        params.append('model', modelTag.name);
       }
+    }
+
+    if (selectedRegion !== 'Region') {
+      params.append('region', selectedRegion);
+    }
+
+    if (params.toString()) {
+      searchUrl += `?${params.toString()}`;
     }
 
     navigate(searchUrl);
@@ -107,8 +168,12 @@ const Navbar = () => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (searchTerm && !selectedTags.find(tag => tag.name.toLowerCase() === searchTerm.trim().toLowerCase())) {
-        const matchedMake = makeSuggestions.find(make => make.name.toLowerCase() === searchTerm.trim().toLowerCase());
-        const matchedModel = modelSuggestions.find(model => model.name.toLowerCase() === searchTerm.trim().toLowerCase());
+        const matchedMake = makeSuggestions.find(make =>
+          make.name.toLowerCase() === searchTerm.trim().toLowerCase()
+        );
+        const matchedModel = modelSuggestions.find(model =>
+          model.name.toLowerCase() === searchTerm.trim().toLowerCase()
+        );
 
         if (matchedMake) {
           setSelectedTags([...selectedTags, { ...matchedMake, type: 'make' }]);
@@ -141,6 +206,25 @@ const Navbar = () => {
     }
   };
 
+  const handleRegionChange = (e) => {
+    const newRegion = e.target.value;
+    updateRegion(newRegion);
+
+    // Update URL with region parameter
+    const searchParams = new URLSearchParams(location.search);
+    if (newRegion !== 'Region') {
+      searchParams.set('region', newRegion);
+    } else {
+      searchParams.delete('region');
+    }
+
+    // Navigate to the same page with updated region parameter
+    const newSearch = searchParams.toString();
+    navigate({
+      pathname: location.pathname,
+      search: newSearch ? `?${newSearch}` : ''
+    });
+  };
   return (
     <header className="header">
       <div className="header-content">
@@ -148,43 +232,61 @@ const Navbar = () => {
           <img src={logo} alt="Auto Dealer Logo" className="logo-image" />
         </Link>
 
-        <div className="mobile-menu-button" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          <span className={`hamburger ${isMenuOpen ? 'open' : ''}`}></span>
-        </div>
-
         <div className={`nav-content ${isMenuOpen ? 'open' : ''}`}>
           <nav className="nav-links">
             <Link to="/" className={isActive('/')}>Home</Link>
             <Link to="/cars-for-sale" className={isActive('/cars-for-sale')}>Buy a Car</Link>
-            <Link to="/sell-car" className={`btn-primary ${isActive('/sell-car')}`}>Sell a Car</Link>
+            <Link to="/sell-car" className={isActive('/sell-car')}>Sell a Car</Link>
+            <Link to="/find-dealer" className={isActive('/find-dealer')}>Find a Dealer</Link>
           </nav>
 
           <div className="search-section">
             <div className="search-bar">
-              <div className="search-bar-content">
-                <div className="tags">
-                  {selectedTags.map(tag => (
-                    <span key={tag.id} className="tag">
-                      {tag.name}
-                      <button onClick={() => removeTag(tag.type)} className="tag-close">×</button>
-                    </span>
+              <div className="region-select-container">
+                <select
+                  className="region-select"
+                  value={selectedRegion}
+                  onChange={handleRegionChange}
+                  aria-label="Select region"
+                >
+                  {regions.map((region) => (
+                    <option key={region} value={region}>
+                      {region}
+                    </option>
                   ))}
-                </div>
-                <input
-                  type="text"
-                  placeholder={selectedTags.length === 0 ? 'Search for cars by make...' : 'Enter model...'}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={selectedTags.length >= 2}
-                />
+                </select>
+                <ChevronDown size={16} className="region-select-arrow" />
               </div>
-              <button className="search-button" onClick={handleSearch}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-              </button>
+
+              <div className="search-content">
+                <div className="search-bar-content">
+                  <div className="tags">
+                    {selectedTags.map(tag => (
+                      <span key={tag.id} className="tag">
+                        {tag.name}
+                        <button
+                          onClick={() => removeTag(tag.type)}
+                          className="tag-close"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="search-input-wrapper">
+                    {selectedTags.length < 2 && <input
+                      type="text"
+                      placeholder="What are you looking for?"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                    />}
+                  </div>
+                </div>
+                <button className="search-button" onClick={handleSearch}>
+                  <Search size={20} />
+                </button>
+              </div>
             </div>
 
             {filteredSuggestions.length > 0 && (
@@ -201,18 +303,6 @@ const Navbar = () => {
               </div>
             )}
           </div>
-
-          <button
-            onClick={toggleTheme}
-            className="theme-toggle-button"
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-          >
-            {theme === 'light' ? (
-              <Moon size={20} className="theme-icon" />
-            ) : (
-              <Sun size={20} className="theme-icon" />
-            )}
-          </button>
         </div>
       </div>
     </header>

@@ -20,14 +20,14 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: white !important; /* Force white color in both modes */
+  color: white !important;
 }
 
 .hero-subtitle {
   font-size: 1.25rem;
   opacity: 0.9;
   margin-bottom: 2rem;
-  color: white !important; /* Force white color in both modes */
+  color: white !important;
 }
 
 .cta-button {
@@ -85,10 +85,16 @@
   line-height: 1.5;
 }
 
+.form-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .form-container {
   max-width: 1000px;
   margin: 0 auto;
   padding: 2rem;
+  animation: fadeSlide 0.3s ease-out;
 }
 
 .form-section {
@@ -144,7 +150,27 @@
   border-color: var(--accent);
 }
 
-/* File Upload Styles */
+.back-button {
+  position: absolute;
+  top: -495px;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: var(--secondary-bg);
+}
+
 .file-upload {
   position: relative;
   border: 2px dashed var(--secondary-bg);
@@ -192,7 +218,6 @@
   color: var(--text-secondary);
 }
 
-/* Image Preview Styles */
 .preview-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -251,12 +276,24 @@
   transition: all 0.2s ease;
   margin: 2rem auto;
   display: block;
+  min-width: 200px;
 }
 
 .submit-button:hover {
   background-color: var(--accent-dark);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(222, 0, 19, 0.2);
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Dark mode specific styles */
@@ -326,6 +363,12 @@
   .preview-container {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
+
+  .back-button {
+    top: -50px;
+    left: 1rem;
+    font-size: 0.875rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -352,6 +395,13 @@
 
   .form-section {
     padding: 1rem;
+  }
+
+  .back-button {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-bottom: 1rem;
   }
 
   .submit-button {
@@ -390,7 +440,8 @@
   .submit-button,
   .form-input,
   .form-select,
-  .remove-image {
+  .remove-image,
+  .form-container {
     transition: none;
   }
 }

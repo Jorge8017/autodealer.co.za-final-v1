@@ -31,7 +31,6 @@ export const SiteFooter = () => {
             <ul>
               <li><Link to="/buying">Buying a Car</Link></li>
               <li><Link to="/selling">Selling a Car</Link></li>
-              <li><Link to="/finalizing">Finalizing the Sale</Link></li>
               <li><Link to="/faqs">FAQs</Link></li>
             </ul>
           </div>

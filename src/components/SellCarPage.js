@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Upload } from 'lucide-react';
+import { Upload, ArrowLeft } from 'lucide-react';
 import './SellCarPage.css';
 
 export default function SellCarPage() {
-  const [formData, setFormData] = useState({
-    make: '',
-    model: '',
-    year: '',
-    transmission: '',
-    mileage: '',
-    fuelType: '',
-    exteriorCondition: '',
-    interiorCondition: '',
+  const [currentStep, setCurrentStep] = useState('personal'); // 'personal' or 'car'
+  const [personalData, setPersonalData] = useState({
     firstName: '',
     lastName: '',
     email: '',
@@ -23,6 +16,17 @@ export default function SellCarPage() {
     postalCode: '',
     country: '',
     additionalInfo: ''
+  });
+
+  const [carData, setCarData] = useState({
+    make: '',
+    model: '',
+    year: '',
+    transmission: '',
+    mileage: '',
+    fuelType: '',
+    exteriorCondition: '',
+    interiorCondition: ''
   });
 
   const [photos, setPhotos] = useState({
@@ -42,6 +46,30 @@ export default function SellCarPage() {
     interiorViews: [],
     damagePhotos: []
   });
+
+  // Clear photo previews on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(previews).forEach(preview => {
+        if (Array.isArray(preview)) {
+          preview.forEach(URL.revokeObjectURL);
+        } else if (preview) {
+          URL.revokeObjectURL(preview);
+        }
+      });
+    };
+  }, [previews]);
+
+  const handlePersonalNext = (e) => {
+    e.preventDefault();
+    setCurrentStep('car');
+    window.scrollTo(0, 0);
+  };
+
+  const handleBack = () => {
+    setCurrentStep('personal');
+    window.scrollTo(0, 0);
+  };
 
   const handleFileSelect = (e, type) => {
     const files = Array.from(e.target.files);
@@ -107,18 +135,49 @@ export default function SellCarPage() {
     }
   };
 
-  useEffect(() => {
-    return () => {
-      Object.values(previews).forEach(preview => {
-        if (Array.isArray(preview)) {
-          preview.forEach(URL.revokeObjectURL);
-        } else if (preview) {
-          URL.revokeObjectURL(preview);
-        }
-      });
-    };
-  }, [previews]);
+  const handleFinalSubmit = async (e) => {
+    e.preventDefault();
+    
+    const formDataToSend = new FormData();
+    
+    // Append all form data
+    Object.entries(personalData).forEach(([key, value]) => {
+      formDataToSend.append(key, value);
+    });
+    Object.entries(carData).forEach(([key, value]) => {
+      formDataToSend.append(key, value);
+    });
+    
+    // Append photos
+    ['frontView', 'backView', 'rightSideView', 'leftSideView'].forEach(type => {
+      if (photos[type]) {
+        formDataToSend.append(type, photos[type]);
+      }
+    });
+    
+    photos.interiorViews.forEach((file, index) => {
+      formDataToSend.append(`interiorViews[${index}]`, file);
+    });
+    
+    photos.damagePhotos.forEach((file, index) => {
+      formDataToSend.append(`damagePhotos[${index}]`, file);
+    });
 
+    try {
+      const response = await fetch('/api/sell-car', {
+        method: 'POST',
+        body: formDataToSend
+      });
+
+      if (response.ok) {
+        alert('Form submitted successfully!');
+      } else {
+        throw new Error('Failed to submit form');
+      }
+    } catch (error) {
+      alert('Error submitting form: ' + error.message);
+    }
+  };
   const FileUploadBox = ({ type, label, hint, multiple = false }) => (
     <div className="file-upload">
       <input
@@ -173,47 +232,6 @@ export default function SellCarPage() {
       )}
     </div>
   );
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const formDataToSend = new FormData();
-    
-    // Append all form fields
-    Object.entries(formData).forEach(([key, value]) => {
-      formDataToSend.append(key, value);
-    });
-    
-    // Append single photos
-    ['frontView', 'backView', 'rightSideView', 'leftSideView'].forEach(type => {
-      if (photos[type]) {
-        formDataToSend.append(type, photos[type]);
-      }
-    });
-    
-    // Append multiple photos
-    photos.interiorViews.forEach((file, index) => {
-      formDataToSend.append(`interiorViews[${index}]`, file);
-    });
-    
-    photos.damagePhotos.forEach((file, index) => {
-      formDataToSend.append(`damagePhotos[${index}]`, file);
-    });
-
-    try {
-      const response = await fetch('/api/sell-car', {
-        method: 'POST',
-        body: formDataToSend
-      });
-
-      if (response.ok) {
-        alert('Form submitted successfully!');
-      } else {
-        throw new Error('Failed to submit form');
-      }
-    } catch (error) {
-      alert('Error submitting form: ' + error.message);
-    }
-  };
 
   return (
     <div className="sell-car-page">
@@ -231,311 +249,316 @@ export default function SellCarPage() {
             <Upload size={48} />
           </div>
           <h3 className="step-title">Step 1</h3>
-          <p className="step-description">Enter your car details and receive an instant offer</p>
+          <p className="step-description">Enter your details</p>
         </div>
         <div className="step-card">
           <div className="step-icon">
             <Upload size={48} />
           </div>
           <h3 className="step-title">Step 2</h3>
-          <p className="step-description">Book a free vehicle inspection at your location</p>
+          <p className="step-description">Provide car information</p>
         </div>
         <div className="step-card">
           <div className="step-icon">
             <Upload size={48} />
           </div>
           <h3 className="step-title">Step 3</h3>
-          <p className="step-description">Get paid instantly and we handle all the paperwork</p>
+          <p className="step-description">Get an instant offer</p>
         </div>
       </div>
 
-      <form id="form-section" className="form-container" onSubmit={handleSubmit}>
-        <div className="form-section">
-          <h2 className="form-section-header">Car Information</h2>
-          
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">Make</label>
-              <select 
-                className="form-select"
-                value={formData.make}
-                onChange={(e) => setFormData({...formData, make: e.target.value})}
-              >
-                <option value="">Select Make</option>
-                <option value="Toyota">Toyota</option>
-                <option value="Volkswagen">Volkswagen</option>
-                <option value="Ford">Ford</option>
-                <option value="BMW">BMW</option>
-              </select>
+      <div className="form-wrapper">
+        {currentStep === 'personal' ? (
+          <form id="form-section" className="form-container" onSubmit={handlePersonalNext}>
+            <div className="form-section">
+              <h2 className="form-section-header">Personal Information</h2>
+              
+              <div className="form-grid">
+                <div className="form-group">
+                  <label className="form-label">First Name</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={personalData.firstName}
+                    onChange={(e) => setPersonalData({...personalData, firstName: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Last Name</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={personalData.lastName}
+                    onChange={(e) => setPersonalData({...personalData, lastName: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Email</label>
+                  <input
+                    type="email"
+                    className="form-input"
+                    value={personalData.email}
+                    onChange={(e) => setPersonalData({...personalData, email: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Phone</label>
+                  <input
+                    type="tel"
+                    className="form-input"
+                    value={personalData.phone}
+                    onChange={(e) => setPersonalData({...personalData, phone: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Address Line 1</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={personalData.addressLine1}
+                  onChange={(e) => setPersonalData({...personalData, addressLine1: e.target.value})}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Address Line 2</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={personalData.addressLine2}
+                  onChange={(e) => setPersonalData({...personalData, addressLine2: e.target.value})}
+                />
+              </div>
+
+              <div className="form-grid">
+                <div className="form-group">
+                  <label className="form-label">City</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={personalData.city}
+                    onChange={(e) => setPersonalData({...personalData, city: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Province</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={personalData.province}
+                    onChange={(e) => setPersonalData({...personalData, province: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Postal Code</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={personalData.postalCode}
+                    onChange={(e) => setPersonalData({...personalData, postalCode: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Country</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={personalData.country}
+                    onChange={(e) => setPersonalData({...personalData, country: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Additional Information</label>
+                <textarea
+                  className="form-input"
+                  rows="4"
+                  value={personalData.additionalInfo}
+                  onChange={(e) => setPersonalData({...personalData, additionalInfo: e.target.value})}
+                />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Model</label>
-              <input
-                type="text"
-                className="form-input"
-                value={formData.model}
-                onChange={(e) => setFormData({...formData, model: e.target.value})}
-              />
+            <button type="submit" className="submit-button">Sell car now</button>
+          </form>
+        ) : null}
+        {currentStep === 'car' && (
+          <form id="form-section" className="form-container" onSubmit={handleFinalSubmit}>
+            <button type="button" onClick={handleBack} className="back-button">
+              <ArrowLeft size={20} /> Back to personal details
+            </button>
+            
+            <div className="form-section">
+              <h2 className="form-section-header">Car Information</h2>
+              
+              <div className="form-grid">
+                <div className="form-group">
+                  <label className="form-label">Make</label>
+                  <select 
+                    className="form-select"
+                    value={carData.make}
+                    onChange={(e) => setCarData({...carData, make: e.target.value})}
+                    required
+                  >
+                    <option value="">Select Make</option>
+                    <option value="Toyota">Toyota</option>
+                    <option value="Volkswagen">Volkswagen</option>
+                    <option value="Ford">Ford</option>
+                    <option value="BMW">BMW</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Model</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={carData.model}
+                    onChange={(e) => setCarData({...carData, model: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Year</label>
+                  <select 
+                    className="form-select"
+                    value={carData.year}
+                    onChange={(e) => setCarData({...carData, year: e.target.value})}
+                    required
+                  >
+                    <option value="">Select Year</option>
+                    {Array.from({ length: 30 }, (_, i) => (
+                      <option key={i} value={new Date().getFullYear() - i}>
+                        {new Date().getFullYear() - i}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Transmission</label>
+                  <select
+                    className="form-select"
+                    value={carData.transmission}
+                    onChange={(e) => setCarData({...carData, transmission: e.target.value})}
+                    required
+                  >
+                    <option value="">Select Transmission</option>
+                    <option value="Automatic">Automatic</option>
+                    <option value="Manual">Manual</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Mileage (Kilometers)</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={carData.mileage}
+                    onChange={(e) => setCarData({...carData, mileage: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Fuel Type</label>
+                  <select
+                    className="form-select"
+                    value={carData.fuelType}
+                    onChange={(e) => setCarData({...carData, fuelType: e.target.value})}
+                    required
+                  >
+                    <option value="">Select Fuel Type</option>
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Electric">Electric</option>
+                    <option value="Hybrid">Hybrid</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Front View Photo</label>
+                <FileUploadBox
+                  type="frontView"
+                  label="Upload front view photo"
+                  hint="Required"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Back View Photo</label>
+                <FileUploadBox
+                  type="backView"
+                  label="Upload back view photo"
+                  hint="Required"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Side Views</label>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <FileUploadBox
+                      type="leftSideView"
+                      label="Upload left side photo"
+                      hint="Required"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <FileUploadBox
+                      type="rightSideView"
+                      label="Upload right side photo"
+                      hint="Required"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Interior Photos</label>
+                <FileUploadBox
+                  type="interiorViews"
+                  label="Upload interior photos"
+                  hint="Up to 10 photos"
+                  multiple
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Damage Photos (if any)</label>
+                <FileUploadBox
+                  type="damagePhotos"
+                  label="Upload damage photos"
+                  hint="Up to 20 photos"
+                  multiple
+                />
+              </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Year</label>
-              <select 
-                className="form-select"
-                value={formData.year}
-                onChange={(e) => setFormData({...formData, year: e.target.value})}
-              >
-                <option value="">Select Year</option>
-                {Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i).map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Transmission</label>
-              <select
-                className="form-select"
-                value={formData.transmission}
-                onChange={(e) => setFormData({...formData, transmission: e.target.value})}
-              >
-                <option value="">Select Transmission</option>
-                <option value="Automatic">Automatic</option>
-                <option value="Manual">Manual</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Mileage (Kilometres)</label>
-              <input
-                type="number"
-                className="form-input"
-                value={formData.mileage}
-                onChange={(e) => setFormData({...formData, mileage: e.target.value})}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Fuel Type</label>
-              <select
-                className="form-select"
-                value={formData.fuelType}
-                onChange={(e) => setFormData({...formData, fuelType: e.target.value})}
-              >
-                <option value="">Select Fuel Type</option>
-                <option value="Petrol">Petrol</option>
-                <option value="Diesel">Diesel</option>
-                <option value="Electric">Electric</option>
-                <option value="Hybrid">Hybrid</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Exterior Condition</label>
-              <select
-                className="form-select"
-                value={formData.exteriorCondition}
-                onChange={(e) => setFormData({...formData, exteriorCondition: e.target.value})}
-              >
-                <option value="">Select Condition</option>
-                <option value="Excellent">Excellent</option>
-                <option value="Good">Good</option>
-                <option value="Fair">Fair</option>
-                <option value="Poor">Poor</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Interior Condition</label>
-              <select
-                className="form-select"
-                value={formData.interiorCondition}
-                onChange={(e) => setFormData({...formData, interiorCondition: e.target.value})}
-              >
-                <option value="">Select Condition</option>
-                <option value="Excellent">Excellent</option>
-                <option value="Good">Good</option>
-                <option value="Fair">Fair</option>
-                <option value="Poor">Poor</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Front View</label>
-            <FileUploadBox
-              type="frontView"
-              label="Click or drag files to upload front view photo"
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Back View</label>
-            <FileUploadBox
-              type="backView"
-              label="Click or drag files to upload back view photo"
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Right Side View</label>
-            <FileUploadBox
-              type="rightSideView"
-              label="Click or drag files to upload right side photo"
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Left Side View</label>
-            <FileUploadBox
-              type="leftSideView"
-              label="Click or drag files to upload left side photo"
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Interior Views</label>
-            <FileUploadBox 
-              type="interiorViews"
-              label="Click or drag files to upload interior photos"
-              hint="(up to 10 photos)"
-              multiple={true}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Damage Photos</label>
-            <FileUploadBox 
-              type="damagePhotos"
-              label="Click or drag files to upload damage photos"
-              hint="(up to 20 photos)"
-              multiple={true}
-            />
-          </div>
-        </div>
-
-        <div className="form-section">
-          <h2 className="form-section-header">Personal Information</h2>
-          
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">First Name</label>
-              <input
-                type="text"
-                className="form-input"
-                value={formData.firstName}
-                onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Last Name</label>
-              <input
-                type="text"
-                className="form-input"
-                value={formData.lastName}
-                onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Email</label>
-              <input
-                type="email"
-                className="form-input"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Phone</label>
-              <input
-                type="tel"
-                className="form-input"
-                value={formData.phone}
-                onChange={(e) => setFormData({...formData, phone: e.target.value})}
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Address Line 1</label>
-            <input
-              type="text"
-              className="form-input"
-              value={formData.addressLine1}
-              onChange={(e) => setFormData({...formData, addressLine1: e.target.value})}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Address Line 2</label>
-            <input
-              type="text"
-              className="form-input"
-              value={formData.addressLine2}
-              onChange={(e) => setFormData({...formData, addressLine2: e.target.value})}
-            />
-          </div>
-
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">City</label>
-              <input
-                type="text"
-                className="form-input"
-                value={formData.city}
-                onChange={(e) => setFormData({...formData, city: e.target.value})}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Province</label>
-              <input
-                type="text"
-                className="form-input"
-                value={formData.province}
-                onChange={(e) => setFormData({...formData, province: e.target.value})}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Postal Code</label>
-              <input
-                type="text"
-                className="form-input"
-                value={formData.postalCode}
-                onChange={(e) => setFormData({...formData, postalCode: e.target.value})}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Country</label>
-              <input
-                type="text"
-                className="form-input"
-                value={formData.country}
-                onChange={(e) => setFormData({...formData, country: e.target.value})}
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Additional Information</label>
-            <textarea
-              className="form-input"
-              rows="4"
-              value={formData.additionalInfo}
-              onChange={(e) => setFormData({...formData, additionalInfo: e.target.value})}
-            />
-          </div>
-        </div>
-
-        <button type="submit" className="submit-button">Submit</button>
-      </form>
+            <button type="submit" className="submit-button">Submit</button>
+          </form>
+        )}
+      </div>
     </div>
   );
 }
-

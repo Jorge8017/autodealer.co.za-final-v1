@@ -2,12 +2,19 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { formatPriceZAR } from '../utils';
 import ContactFormModal from './ContactFormModal';
+import LoadingSpinner from './LoadingSpinner';
 import axios from 'axios';
 import './CarDetailPage.css';
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const DEALER_API_ENDPOINT = process.env.REACT_APP_DEALER_API_ENDPOINT;
+const FEATURED_API_ENDPOINT = process.env.REACT_APP_FEATURED_API_ENDPOINT;
 
 const CarDetailPage = () => {
   const { id, carSlug } = useParams();
   const navigate = useNavigate();
+  
+  // State declarations
   const [carData, setCarData] = useState(null);
   const [suggestedCars, setSuggestedCars] = useState([]);
   const [mainImage, setMainImage] = useState(0);
@@ -17,13 +24,71 @@ const CarDetailPage = () => {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState(null);
 
+  // Format mileage with km/h
+  const formatMileage = (mileage) => {
+    return `${mileage}km/h`;
+  };
+
+  // Format car details
+  const formatCarDetails = (transmission, mileage) => {
+    return `${transmission} • ${formatMileage(mileage)}`;
+  };
+
+  // Generate car slug
+  const generateCarSlug = (car) => {
+    return `used-${car.year}-${car.make}-${car.model}-${car.region}-${car.city}`
+      .toLowerCase()
+      .replace(/\s+/g, '-');
+  };
+
+  // Handlers
+  const handleImageClick = (imageUrl) => {
+    setModalImage(imageUrl);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setModalImage(null);
+  };
+
+  const handleImageNavigation = (direction) => {
+    if (direction === 'next') {
+      setMainImage(prev => prev === images.length - 1 ? 0 : prev + 1);
+    } else {
+      setMainImage(prev => prev === 0 ? images.length - 1 : prev - 1);
+    }
+  };
+
+  const handleModalNavigation = (direction) => {
+    const currentIndex = images.findIndex(img => img === modalImage);
+    let newIndex;
+    
+    if (direction === 'next') {
+      newIndex = currentIndex === images.length - 1 ? 0 : currentIndex + 1;
+    } else {
+      newIndex = currentIndex === 0 ? images.length - 1 : currentIndex - 1;
+    }
+    
+    setModalImage(images[newIndex]);
+    setMainImage(newIndex);
+  };
+
+  const handleGalleryNavigation = () => {
+    navigate(`/car-for-sale/${id}/photos`);
+  };
+
+  const handleContactClick = () => {
+    setIsContactModalOpen(true);
+  };
+
   // Fetch car data and suggested cars
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         // Fetch main car data
-        const carResponse = await fetch(`https://dealer.carmag.co.za/autodealer-api-new.php?getlistings=1&single=1&ID=${id}`);
+        const carResponse = await fetch(`${API_BASE_URL}${DEALER_API_ENDPOINT}?getlistings=1&single=1&ID=${id}`);
         const carData = await carResponse.json();
         
         if (carData.listings && carData.listings.length > 0) {
@@ -33,18 +98,17 @@ const CarDetailPage = () => {
         }
 
         // Fetch featured cars for suggestions
-        const featuredResponse = await axios.get('https://dealer.carmag.co.za/featured-api.json');
+        const featuredResponse = await axios.get(`${API_BASE_URL}${FEATURED_API_ENDPOINT}`);
         const featuredIds = featuredResponse.data.car_ids;
 
-        // Fetch details for each featured car
         const featuredDetailsPromises = featuredIds.map(featuredId =>
-          axios.get(`https://dealer.carmag.co.za/autodealer-api-new.php?getlistings=1&single=1&ID=${featuredId}`)
+          axios.get(`${API_BASE_URL}${FEATURED_API_ENDPOINT}`)
         );
 
         const featuredResults = await Promise.all(featuredDetailsPromises);
         const featuredCars = featuredResults
           .map(response => response.data.listings?.[0])
-          .filter(car => car && car.id !== id); // Filter out current car
+          .filter(car => car && car.id !== id);
 
         setSuggestedCars(featuredCars);
       } catch (err) {
@@ -86,7 +150,7 @@ const CarDetailPage = () => {
     };
   }, [isModalOpen, isContactModalOpen]);
 
-  if (loading) return <div className="loading-state">Loading car details...</div>;
+  if (loading) return <LoadingSpinner />;
   if (error) return <div className="error-state">{error}</div>;
   if (!carData) return <div className="error-state">No car data available.</div>;
 
@@ -99,53 +163,6 @@ const CarDetailPage = () => {
   const highlights = features.slice(0, Math.ceil(features.length / 3));
   const equipment = features.slice(Math.ceil(features.length / 3), Math.ceil(features.length * 2/3));
   const additionalFeatures = features.slice(Math.ceil(features.length * 2/3));
-
-  const generateCarSlug = (car) => {
-    return `used-${car.year}-${car.make}-${car.model}-${car.region}-${car.city}`
-      .toLowerCase()
-      .replace(/\s+/g, '-');
-  };
-
-  const handleImageClick = (imageUrl) => {
-    setModalImage(imageUrl);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setModalImage(null);
-  };
-
-  const handleImageNavigation = (direction) => {
-    if (direction === 'next') {
-      setMainImage(prev => prev === images.length - 1 ? 0 : prev + 1);
-    } else {
-      setMainImage(prev => prev === 0 ? images.length - 1 : prev - 1);
-    }
-  };
-
-  const handleModalNavigation = (direction) => {
-    const currentIndex = images.findIndex(img => img === modalImage);
-    let newIndex;
-    
-    if (direction === 'next') {
-      newIndex = currentIndex === images.length - 1 ? 0 : currentIndex + 1;
-    } else {
-      newIndex = currentIndex === 0 ? images.length - 1 : currentIndex - 1;
-    }
-    
-    setModalImage(images[newIndex]);
-    setMainImage(newIndex);
-  };
-
-  const handleGalleryNavigation = () => {
-    navigate(`/car-for-sale/${id}/photos`);
-  };
-
-  const handleContactClick = () => {
-    setIsContactModalOpen(true);
-  };
-
   return (
     <div className="car-detail-page">
       {isModalOpen && (
@@ -197,7 +214,7 @@ const CarDetailPage = () => {
 
         <div className="image-gallery">
           <div className="main-image-section">
-            <div className="main-image-container scrollable">
+            <div className="main-image-container">
               {carData.category && (
                 <div className="category-label">{carData.category}</div>
               )}
@@ -257,13 +274,14 @@ const CarDetailPage = () => {
             )}
           </div>
         </div>
+
         <div className="car-details-layout">
           <div className="car-details-main">
+            <div className="car-subtitle">
+              {formatCarDetails(carData.transmission, carData.km)} • {carData.bodytype}
+            </div>
             <div className="price-section">
               <div className="current-price">{formatPriceZAR(carData.price)}</div>
-              <div className="car-subtitle">
-                {carData.km} • {carData.transmission} • {carData.bodytype}
-              </div>
             </div>
 
             <div className="details-grid">
@@ -278,7 +296,7 @@ const CarDetailPage = () => {
                 </div>
                 <div className="spec-item">
                   <div className="spec-label">Mileage</div>
-                  <div className="spec-value">{carData.km}</div>
+                  <div className="spec-value">{formatMileage(carData.km)}</div>
                 </div>
                 <div className="spec-item">
                   <div className="spec-label">VIN</div>
@@ -411,7 +429,8 @@ const CarDetailPage = () => {
                           {car.year} {car.make} {car.model}
                         </div>
                         <div className="car-details">
-                          {`${car.engine || ''} ${car.transmission} ${car.km}\n${car.city}, ${car.region}`}
+                          {formatCarDetails(car.transmission, car.km)}
+                          {`\n${car.city}, ${car.region}`}
                         </div>
                       </div>
                     </div>

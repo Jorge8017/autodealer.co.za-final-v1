@@ -1,10 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { formatPriceZAR } from '../utils';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import LoadingSpinner from './LoadingSpinner';
+import axios from 'axios';
 import './InventoryPage.css';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const DEALER_API_ENDPOINT = process.env.REACT_APP_DEALER_API_ENDPOINT;
+const FEATURED_API_ENDPOINT = process.env.REACT_APP_FEATURED_API_ENDPOINT;
+
+
 const InventoryPage = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // State declarations
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,19 +26,29 @@ const InventoryPage = () => {
   const scrollContainerRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  
+
+  // Get URL parameters
+  const make = searchParams.get('make') || '';
+  const model = searchParams.get('model') || '';
+  const region = searchParams.get('region') || '';
+  const bodytype = searchParams.get('bodytype') || '';
+  const maxPrice = searchParams.get('max-price');
+
   // State for filters
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedTransmission, setSelectedTransmission] = useState('');
-  const [selectedBodyType, setSelectedBodyType] = useState('');
+  const [selectedBodyType, setSelectedBodyType] = useState(bodytype);
   const [selectedRegion, setSelectedRegion] = useState('');
   const [sortOrder, setSortOrder] = useState('newly-listed');
 
-  const location = useLocation();
-  const navigate = useNavigate();
-  const searchParams = new URLSearchParams(location.search);
-  const make = searchParams.get('make') || '';
-  const model = searchParams.get('model') || '';
+  // Options for filter dropdowns
+  const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i);
+  const transmissions = ['Automatic', 'Manual'];
+  const bodyTypes = ['Sedan', 'SUV', 'Truck', 'Coupe', 'Hatchback', 'Van', 'Wagon', 'Convertible'];
+  const regions = [
+    'Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal', 'Limpopo',
+    'Mpumalanga', 'Northern Cape', 'North West', 'Western Cape'
+  ];
 
   // Sort order constants
   const SORT_ORDERS = {
@@ -39,28 +60,85 @@ const InventoryPage = () => {
     'mileage-high': 'MileageHigh'
   };
 
-  // Options for filter dropdowns
-  const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i);
-  const transmissions = ['Automatic', 'Manual'];
-  const bodyTypes = ['Sedan', 'SUV', 'Coupe', 'Wagon', 'Convertible'];
-  const regions = [
-    'Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal', 'Limpopo',
-    'Mpumalanga', 'Northern Cape', 'North West', 'Western Cape'
-  ];
+  // Format helpers
+  const formatMileage = (mileage) => `${mileage} km/h`;
+  const formatCarDetails = (transmission, mileage) => `${transmission} • ${formatMileage(mileage)}`;
+  
+  const generateCarSlug = (car) => {
+    return `${car.year}-${car.make}-${car.model}-${car.region}-${car.city}`
+      .toLowerCase()
+      .replace(/\s+/g, '-');
+  };
+  // Effects and handlers
+  useEffect(() => {
+    const fetchCars = async () => {
+      setLoading(true);
+      try {
+        // Construct API URL with filters
+        let apiUrl = `${API_BASE_URL}${DEALER_API_ENDPOINT}?getlistings=1`;
+        
+        // Add max price if provided
+        if (maxPrice) {
+          apiUrl += `&Max-price=${maxPrice}`;
+        } else {
+          apiUrl += '&Max-price=7000000'; // Default max price
+        }
+        
+        // Add other filters
+        if (make) apiUrl += `&Makes=${make}`;
+        if (model) apiUrl += `&Models=${model}`;
+        if (selectedYear) apiUrl += `&MinYear=${selectedYear}&MaxYear=${selectedYear}`;
+        if (selectedTransmission) apiUrl += `&transmission=${selectedTransmission}`;
+        if (selectedBodyType) apiUrl += `&bodytype=${selectedBodyType}`;
+        if (selectedRegion) apiUrl += `&Region=${selectedRegion}`;
+        
+        apiUrl += `&sortorder=${SORT_ORDERS[sortOrder]}`;
+        apiUrl += `&page=${page}`;
+        apiUrl += `&dealershipname=`;
+        apiUrl += `&sortorder=Used`;
+
+        const response = await axios.get(apiUrl);
+        
+        if (response.data && response.data.listings) {
+          setCars(response.data.listings);
+          setTotalPages(response.data.total_pages || 1);
+        } else {
+          setCars([]);
+          setTotalPages(1);
+        }
+        setError(null);
+      } catch (err) {
+        setError('Failed to fetch car data');
+        console.error('API Error:', err);
+      }
+      setLoading(false);
+    };
+
+    fetchCars();
+  }, [make, model, page, selectedYear, selectedTransmission, selectedBodyType, selectedRegion, sortOrder, maxPrice]);
+
+  // Effect for model selection
+  useEffect(() => {
+    if (make && !model) {
+      const searchParams = new URLSearchParams(location.search); 
+      searchParams.delete('model');
+      navigate(`/cars-for-sale?${searchParams.toString()}`);
+    }
+  }, [make, model, location.search, navigate]);
 
   // Check scroll capability
-  const checkScroll = () => {
+  const checkScroll = useCallback(() => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
       setCanScrollLeft(scrollLeft > 0);
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
     }
-  };
+  }, []);
 
   // Add scroll check whenever models change
   useEffect(() => {
     checkScroll();
-  }, [availableModels]);
+  }, [availableModels, checkScroll]);
 
   // Add scroll event listener
   useEffect(() => {
@@ -74,133 +152,36 @@ const InventoryPage = () => {
         window.removeEventListener('resize', checkScroll);
       };
     }
-  }, []);
+  }, [checkScroll]);
 
   const handleScroll = (direction) => {
     if (scrollContainerRef.current) {
       const scrollAmount = 200;
-      const currentScroll = scrollContainerRef.current.scrollLeft;
-      
-      scrollContainerRef.current.scrollTo({
-        left: direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount,
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
       });
     }
   };
 
-  // Function to get make ID from URL or another source
-  const getMakeId = async (makeName) => {
-    try {
-      const response = await fetch('https://dealer.carmag.co.za/app/ajax.php?getmakes');
-      const makes = await response.json();
-      const makeInfo = makes.find(m => m.name.toLowerCase() === makeName.toLowerCase());
-      return makeInfo?.id;
-    } catch (error) {
-      console.error('Error fetching makes:', error);
-      return null;
-    }
-  };
-
-  // Fetch models for specific make
-  const fetchModelsForMake = async (makeId) => {
-    if (!makeId) return;
-    
-    setLoadingModels(true);
-    try {
-      const response = await fetch(`https://dealer.carmag.co.za/app/ajax.php?getranges=1&ID=${makeId}`);
-      const data = await response.json();
-      
-      if (Array.isArray(data)) {
-        setAvailableModels(data);
-      } else {
-        setAvailableModels([]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch models:', error);
-      setAvailableModels([]);
-    } finally {
-      setLoadingModels(false);
-    }
-  };
-
-  // Fetch models when make changes
-  useEffect(() => {
-    const initModels = async () => {
-      if (make) {
-        const makeId = await getMakeId(make);
-        if (makeId) {
-          await fetchModelsForMake(makeId);
-        }
-      } else {
-        setAvailableModels([]);
-      }
-    };
-
-    initModels();
-  }, [make]);
-
-  // Fetch cars data
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        let apiUrl = '';
-
-        // If no filters are applied, use the default URL
-        if (!make && !model && !selectedYear && !selectedTransmission && 
-            !selectedBodyType && !selectedRegion) {
-          apiUrl = 'https://dealer.carmag.co.za/autodealer-api-new.php?getlistings=1&Category=&Makes=&Models=&Variant=&Region=&City=&MinYear=&MaxYear=&Max-Mileage=&Min-price=&Max-price=7000000&bodytype=&Colour=&dealershipname=&sortorder=${SORT_ORDERS[sortOrder]}&page=${page}';
-        } else {
-          // If filters are applied, construct the URL with filters
-          apiUrl = 'https://dealer.carmag.co.za/autodealer-api-new.php?getlistings=1';
-          if (make) apiUrl += `&Makes=${make}`;
-          if (model) apiUrl += `&Models=${model}`;
-          if (selectedYear) apiUrl += `&MinYear=${selectedYear}&MaxYear=${selectedYear}`;
-          if (selectedTransmission) apiUrl += `&transmission=${selectedTransmission}`;
-          if (selectedBodyType) apiUrl += `&bodytype=${selectedBodyType}`;
-          if (selectedRegion) apiUrl += `&Region=${selectedRegion}`;
-          
-          // Add sort order and default parameters
-          apiUrl += `&sortorder=${SORT_ORDERS[sortOrder]}`;
-          apiUrl += `&Max-price=7000000`;
-          apiUrl += `&page=${page}`;
-        }
-
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-
-        if (data.listings && Array.isArray(data.listings)) {
-          setCars(data.listings);
-          setTotalPages(data.total_pages || 1);
-        } else {
-          setCars([]);
-          setTotalPages(1);
-        }
-      } catch (err) {
-        setError('Failed to fetch car data');
-      }
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [make, model, page, selectedYear, selectedTransmission, selectedBodyType, selectedRegion, sortOrder]);
-
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
-    window.scrollTo(0, 0);
-  };
-
   const handleFilterChange = (filterType, value) => {
     setPage(1);
+    const searchParams = new URLSearchParams(location.search);
+
     switch (filterType) {
+      case 'bodytype':
+        setSelectedBodyType(value);
+        if (value) {
+          searchParams.set('bodytype', value);
+        } else {
+          searchParams.delete('bodytype');
+        }
+        break;
       case 'year':
         setSelectedYear(value);
         break;
       case 'transmission':
         setSelectedTransmission(value);
-        break;
-      case 'bodyType':
-        setSelectedBodyType(value);
         break;
       case 'region':
         setSelectedRegion(value);
@@ -208,22 +189,20 @@ const InventoryPage = () => {
       case 'sort':
         setSortOrder(value);
         break;
-      case 'model':
-        navigate(`/cars-for-sale?make=${make}&model=${value}`);
-        break;
       default:
         break;
     }
+
+    navigate(`/cars-for-sale?${searchParams.toString()}`);
   };
 
-  const generateCarSlug = (car) => {
-    return `${car.year}-${car.make}-${car.model}-${car.region}-${car.city}`
-      .toLowerCase()
-      .replace(/\s+/g, '-');
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    window.scrollTo(0, 0);
   };
 
-  if (loading) return <div>Loading cars...</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <div className="error-state">{error}</div>;
 
   const pageTitle = make ? `Used ${make} Cars for Sale` : 'Cars for Sale';
 
@@ -232,143 +211,89 @@ const InventoryPage = () => {
       <main className="inventory-content">
         <h1 className="inventory-title">{pageTitle}</h1>
         
-        {/* Model Filters */}
-        {make && !loadingModels && availableModels.length > 0 && (
-          <div className="model-filters">
-            {canScrollLeft && (
-              <button 
-                className="scroll-button left"
-                onClick={() => handleScroll('left')}
-                aria-label="Scroll left"
-              >
-                <ChevronLeft size={24} />
-              </button>
-            )}
-            
-            <div 
-              className="model-filters-scroll"
-              ref={scrollContainerRef}
-              onScroll={checkScroll}
+        <div className="filters-sort-container">
+          <div className="sort-options">
+            <button
+              className={`sort-option ${sortOrder === 'newly-listed' ? 'active' : ''}`}
+              onClick={() => handleFilterChange('sort', 'newly-listed')}
             >
-              {availableModels.map((modelOption) => (
-                <button
-                  key={modelOption.id}
-                  className={`model-filter-btn ${model === modelOption.name ? 'active' : ''}`}
-                  onClick={() => handleFilterChange('model', modelOption.name)}
-                >
-                  {modelOption.name}
-                </button>
-              ))}
+              Newly Listed
+            </button>
+            <button
+              className={`sort-option ${sortOrder === 'price-low' ? 'active' : ''}`}
+              onClick={() => handleFilterChange('sort', 'price-low')}
+            >
+              Price low to high
+            </button>
+            <button
+              className={`sort-option ${sortOrder === 'price-high' ? 'active' : ''}`}
+              onClick={() => handleFilterChange('sort', 'price-high')}
+            >
+              Price high to low
+            </button>
+            <button
+              className={`sort-option ${sortOrder === 'mileage-low' ? 'active' : ''}`}
+              onClick={() => handleFilterChange('sort', 'mileage-low')}
+            >
+              Mileage low to high
+            </button>
+          </div>
+
+          <div className="filter-dropdowns">
+            <div className="filter-dropdown">
+              <select
+                value={selectedBodyType}
+                onChange={(e) => handleFilterChange('bodytype', e.target.value)}
+                className="filter-select"
+              >
+                <option value="">Body Type</option>
+                {bodyTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
             </div>
 
-            {canScrollRight && (
-              <button 
-                className="scroll-button right"
-                onClick={() => handleScroll('right')}
-                aria-label="Scroll right"
+            <div className="filter-dropdown">
+              <select
+                value={selectedTransmission}
+                onChange={(e) => handleFilterChange('transmission', e.target.value)}
+                className="filter-select"
               >
-                <ChevronRight size={24} />
-              </button>
-            )}
-          </div>
-        )}
+                <option value="">Transmission</option>
+                {transmissions.map((transmission) => (
+                  <option key={transmission} value={transmission}>{transmission}</option>
+                ))}
+              </select>
+            </div>
 
-        {/* Filter Dropdowns */}
-        <div className="filter-dropdowns">
-          <div className="filter-dropdown">
-            <select
-              value={selectedRegion}
-              onChange={(e) => handleFilterChange('region', e.target.value)}
-              className="filter-select"
-            >
-              <option value="">Region</option>
-              {regions.map((region) => (
-                <option key={region} value={region}>{region}</option>
-              ))}
-            </select>
-          </div>
+            <div className="filter-dropdown">
+              <select
+                value={selectedYear}
+                onChange={(e) => handleFilterChange('year', e.target.value)}
+                className="filter-select"
+              >
+                <option value="">Year</option>
+                {years.map((year) => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
 
-          <div className="filter-dropdown">
-            <select
-              value={selectedYear}
-              onChange={(e) => handleFilterChange('year', e.target.value)}
-              className="filter-select"
-            >
-              <option value="">Years</option>
-              {years.map((year) => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-dropdown">
-            <select
-              value={selectedTransmission}
-              onChange={(e) => handleFilterChange('transmission', e.target.value)}
-              className="filter-select"
-            >
-              <option value="">Transmission</option>
-              {transmissions.map((transmission) => (
-                <option key={transmission} value={transmission}>{transmission}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-dropdown">
-            <select
-              value={selectedBodyType}
-              onChange={(e) => handleFilterChange('bodyType', e.target.value)}
-              className="filter-select"
-            >
-              <option value="">Body Type</option>
-              {bodyTypes.map((type) => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
+            <div className="filter-dropdown">
+              <select
+                value={selectedRegion}
+                onChange={(e) => handleFilterChange('region', e.target.value)}
+                className="filter-select"
+              >
+                <option value="">Region</option>
+                {regions.map((region) => (
+                  <option key={region} value={region}>{region}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Sort Options */}
-        <div className="sort-options">
-          <button
-            className={`sort-option ${sortOrder === 'newly-listed' ? 'active' : ''}`}
-            onClick={() => handleFilterChange('sort', 'newly-listed')}
-          >
-            Newly Listed
-          </button>
-          <button
-            className={`sort-option ${sortOrder === 'old-to-new' ? 'active' : ''}`}
-            onClick={() => handleFilterChange('sort', 'old-to-new')}
-          >
-            Old to New
-          </button>
-          <button
-            className={`sort-option ${sortOrder === 'price-low' ? 'active' : ''}`}
-            onClick={() => handleFilterChange('sort', 'price-low')}
-          >
-            Price low to high
-          </button>
-          <button
-            className={`sort-option ${sortOrder === 'price-high' ? 'active' : ''}`}
-            onClick={() => handleFilterChange('sort', 'price-high')}
-          >
-            Price high to low
-          </button>
-          <button
-            className={`sort-option ${sortOrder === 'mileage-low' ? 'active' : ''}`}
-            onClick={() => handleFilterChange('sort', 'mileage-low')}
-          >
-            Mileage low to high
-          </button>
-          <button
-            className={`sort-option ${sortOrder === 'mileage-high' ? 'active' : ''}`}
-            onClick={() => handleFilterChange('sort', 'mileage-high')}
-          >
-            Mileage high to low
-          </button>
-        </div>
-        
-        {/* Car Grid */}
         <div className="car-grid">
           {cars.map((car) => (
             <Link 
@@ -384,7 +309,7 @@ const InventoryPage = () => {
                     loading="lazy"
                   />
                   <div className="car-item-price">
-                    {formatPriceZAR(car.price)}
+                    {car.price}
                   </div>
                 </div>
                 <div className="car-info">
@@ -392,7 +317,8 @@ const InventoryPage = () => {
                     {car.year} {car.make} {car.model}
                   </div>
                   <div className="car-details">
-                    {`${car.km} • ${car.transmission}\n${car.city}, ${car.region}`}
+                    {formatCarDetails(car.transmission, car.km)}
+                    {`\n${car.city}, ${car.region}`}
                   </div>
                 </div>
               </div>
@@ -400,18 +326,19 @@ const InventoryPage = () => {
           ))}
         </div>
 
-        {/* Pagination */}
-        <div className="pagination-container">
-          <div className="pagination">
-            {page > 1 && (
-              <button onClick={() => handlePageChange(page - 1)}>Previous</button>
-            )}
-            <span>Page {page} of {totalPages}</span>
-            {page < totalPages && (
-              <button onClick={() => handlePageChange(page + 1)}>Next</button>
-            )}
+        {totalPages > 1 && (
+          <div className="pagination-container">
+            <div className="pagination">
+              {page > 1 && (
+                <button onClick={() => handlePageChange(page - 1)}>Previous</button>
+              )}
+              <span>Page {page} of {totalPages}</span>
+              {page < totalPages && (
+                <button onClick={() => handlePageChange(page + 1)}>Next</button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   );

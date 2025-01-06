@@ -1,0 +1,294 @@
+.price-range-page {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+  
+  .breadcrumb {
+    margin-bottom: 1rem;
+    color: #666;
+  }
+  
+  .breadcrumb a {
+    color: #666;
+    text-decoration: none;
+  }
+  
+  .breadcrumb span {
+    margin: 0 0.5rem;
+    color: #999;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 3rem;
+    color: #333;
+  }
+  
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #333;
+  }
+  
+  .brand-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 4rem;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .price-grid {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 4rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+  }
+  
+  .brand-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
+  }
+  
+  .price-card {
+    flex: 0 0 auto;
+    width: 200px;
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 250px;
+  }
+  
+  .brand-card:hover,
+  .price-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .brand-logo {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 0.75rem;
+  }
+  
+  .brand-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+  }
+  
+  .price-from {
+    color: #666;
+    font-size: 0.8125rem;
+  }
+  
+  .price-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 0.75rem;
+    color: #de0013;
+  }
+  
+  .price-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+  }
+  
+  .price-description {
+    color: #666;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .available-deals-button {
+    background-color: #de0013;
+    color: white;
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    text-align: center;
+    margin-top: auto;
+  }
+  
+  .available-deals-button:hover {
+    background-color: #b1000f;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .price-grid::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .price-grid {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* Larger screens */
+  @media (min-width: 1200px) {
+    .price-range-page {
+      padding: 2rem 4rem;
+    }
+  }
+  
+  /* Medium screens */
+  @media (max-width: 1024px) {
+    .brand-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .price-grid {
+      justify-content: flex-start;
+      padding: 0 1rem;
+    }
+  
+    .brand-card {
+      max-width: 200px;
+    }
+  
+    .price-card {
+      width: 180px;
+    }
+  
+    .page-title {
+      font-size: 1.75rem;
+    }
+  
+    .section-title {
+      font-size: 1.5rem;
+    }
+  }
+  
+  /* Small screens */
+  @media (max-width: 640px) {
+    .price-range-page {
+      padding: 1rem;
+    }
+  
+    .brand-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+  
+    .brand-card {
+      max-width: 160px;
+      padding: 1rem;
+    }
+  
+    .price-card {
+      width: 160px;
+      padding: 1rem;
+    }
+  
+    .brand-logo,
+    .price-icon {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 0.5rem;
+    }
+  
+    .brand-name,
+    .price-label {
+      font-size: 1rem;
+    }
+  
+    .price-from,
+    .price-description {
+      font-size: 0.75rem;
+    }
+  
+    .page-title {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+    }
+  
+    .section-title {
+      font-size: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+  
+    .available-deals-button {
+      padding: 0.625rem;
+      font-size: 0.8125rem;
+    }
+  }
+  
+  /* Very small screens */
+  @media (max-width: 380px) {
+    .brand-card,
+    .price-card {
+      max-width: 140px;
+      padding: 0.75rem;
+    }
+  
+    .brand-logo,
+    .price-icon {
+      width: 40px;
+      height: 40px;
+    }
+  
+    .brand-name,
+    .price-label {
+      font-size: 0.875rem;
+    }
+  
+    .available-deals-button {
+      padding: 0.5rem;
+      font-size: 0.75rem;
+    }
+  }
+  
+  /* Accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .brand-card,
+    .price-card,
+    .available-deals-button {
+      transition: none;
+    }
+  }
+  
+  /* Focus states */
+  .brand-card:focus-visible,
+  .price-card:focus-visible,
+  .available-deals-button:focus-visible {
+    outline: 2px solid #de0013;
+    outline-offset: 2px;
+  }

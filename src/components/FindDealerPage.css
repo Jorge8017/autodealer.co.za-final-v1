@@ -1,0 +1,303 @@
+.find-dealer-page {
+  background-color: var(--background);
+  min-height: 100vh;
+  padding-top: 72px;
+}
+
+.hero-section {
+  background-color: var(--accent);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: white !important;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+  color: white !important;
+}
+
+.search-container {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.dealer-search-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--search-bg);
+  border-radius: 35px;
+  width: 100%;
+  height: 42px;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme='light'] .dealer-search-bar {
+  background-color: white;
+  border: 1px solid #e9ecef;
+}
+
+.search-content {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  padding: 6px 16px;
+}
+
+.search-bar-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.search-input-wrapper {
+  flex: 1;
+  min-width: 50px;
+  overflow: hidden;
+}
+
+.dealer-search-bar input {
+  border: none;
+  background: none;
+  outline: none;
+  width: 100%;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  padding: 0;
+}
+
+[data-theme='light'] .dealer-search-bar input {
+  color: #666;
+}
+
+.dealer-search-bar input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.dealer-search-bar input:focus::placeholder {
+  opacity: 0;
+}
+
+.search-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+}
+
+[data-theme='light'] .search-button {
+  color: #666;
+}
+
+.search-button:hover {
+  color: var(--accent);
+}
+
+.dealer-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.5rem;
+  background-color: var(--background);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dealer-suggestion-item {
+  padding: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dealer-suggestion-item:hover {
+  background-color: var(--secondary-bg);
+}
+
+.dealer-suggestion-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.dealer-count {
+  color: #666666;
+  opacity: 0.8;
+}
+
+[data-theme='dark'] .dealer-count {
+  color: #999999;
+}
+
+.dealer-suggestion-location {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.form-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.form-section {
+  background-color: var(--secondary-bg);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-section-header {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.province-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.province-button {
+  background-color: var(--background);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.province-button:hover {
+  background-color: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.province-button.active {
+  background-color: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+/* Dark mode specific styles */
+[data-theme='dark'] .form-section {
+  background-color: var(--secondary-bg);
+}
+
+/* Loading and error states */
+.dealer-suggestions-loading,
+.dealer-suggestions-error,
+.no-results {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .form-container {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 3rem 1.5rem;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .form-section {
+    padding: 1.5rem;
+  }
+
+  .province-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 2rem 1rem;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .form-container {
+    padding: 1rem;
+  }
+
+  .form-section {
+    padding: 1rem;
+  }
+
+  .form-section-header {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .province-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+  .province-button:hover {
+    transform: none;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .province-button {
+    transition: none;
+  }
+}
+
+.province-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

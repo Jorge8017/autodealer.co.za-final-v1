@@ -46,8 +46,12 @@
   .news-title {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--news-title-color);
+    color: white;
     margin-bottom: 2rem;
+  }
+
+  [data-theme=light] .news-title {
+    color: #333333;
   }
   
   .news-grid {
